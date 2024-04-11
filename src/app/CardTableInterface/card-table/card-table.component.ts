@@ -3,8 +3,17 @@ import {Card} from "../../Model/Card";
 import {CardServiceService} from "../../Service/card-service.service";
 import {Route, Router, Routes , RouterModule} from "@angular/router";
 import path from "node:path";
-import {MatCell, MatColumnDef, MatHeaderCell, MatHeaderRow, MatRow, MatTable} from "@angular/material/table";
+import {
+  MatCell, MatCellDef,
+  MatColumnDef,
+  MatHeaderCell,
+  MatHeaderCellDef,
+  MatHeaderRow, MatHeaderRowDef,
+  MatRow, MatRowDef,
+  MatTable
+} from "@angular/material/table";
 import {MatSort} from "@angular/material/sort";
+import {FormsModule} from "@angular/forms";
 @Component({
   selector: 'app-card-table',
   standalone: true,
@@ -15,42 +24,41 @@ import {MatSort} from "@angular/material/sort";
     MatColumnDef,
     MatCell,
     MatHeaderRow,
-    MatRow
+    MatRow,
+    MatHeaderCellDef,
+    MatCellDef,
+    MatHeaderRowDef,
+    MatRowDef,
+    FormsModule
   ],
   templateUrl: './card-table.component.html',
   styleUrl: './card-table.component.css'
 })
 export class CardTableComponent implements OnInit{
 
-  public resultCards!: Card[];
+  public resultCards: Card[] =[];
+  public filterClass: string = "";
+  public filterType: string = "";
+  public filterName: string = "";
 
-  public displayedColumns: string[] = ['name', 'cost', 'attack', 'health', 'description'];
-  public hearthstoneCards: Card[] = [
-    {
-      cardId: "EX1_001",
-      name: "Lightwarden",
-      cost: 1,
-      attack: 1,
-      health: 2,
-      text: "Whenever a character is healed, gain +2 Attack."
-    },
-    {
-      cardId: "EX1_002",
-      name: "The Black Knight",
-      cost: 6,
-      attack: 4,
-      health: 5,
-      text: "Battlecry: Destroy an enemy minion with Taunt."
-    },
-    {
-      cardId: "EX1_003",
-      name: "Big Game Hunter",
-      cost: 5,
-      attack: 4,
-      health: 2,
-      text: "Battlecry: Destroy a minion with 7 or more Attack."
-    },
-    ]
+  async applyFilter() {
+    if (this.filterClass) {
+      this.resultCards = await this.cardService.findCardByClass(this.filterClass);
+    }  else if (this.filterType) {
+      this.resultCards = await this.cardService.findCardsByType(this.filterType);
+    }
+    this.resultCards = this.resultCards.filter(card =>
+      card.cardId !== undefined &&
+      card.name !== undefined &&
+      card.cost !== undefined &&
+      card.attack !== undefined &&
+      card.health !== undefined &&
+      card.text !== undefined &&
+      card.type !== undefined
+    );
+  }
+  public displayedColumns: string[] = ['name', 'cost', 'attack', 'health', 'description','picture'];
+
   public route : Routes = [
     {path: '/cards' , component:CardTableComponent }
   ]
@@ -60,14 +68,19 @@ export class CardTableComponent implements OnInit{
 
  }
 
-  ngOnInit(): void {
+  async ngOnInit(): Promise<void> {
     /* fix this */
-    this.cardService.findAllCards().then((data) => {
-      this.resultCards = data;
-    });
+    try {
+      this.resultCards = await this.cardService.findSingleCard("Wisp");
+      console.log(this.resultCards);
 
+    }
+    catch (error)
+    {
+      console.log(error);
+    }
     /* output the result */
-    console.log(this.resultCards);
+
   }
 
 }

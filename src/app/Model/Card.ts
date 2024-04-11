@@ -4,5 +4,7 @@ export interface Card {
   cost:number,
   attack:number,
   health:number,
-  text:string
+  text:string,
+  type:string,
+  picture:string
 }

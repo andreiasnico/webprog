@@ -4,16 +4,24 @@ import {HttpClient} from "@angular/common/http";
 import {get} from "node:http";
 import {error} from "@angular/compiler-cli/src/transformers/util";
 import {Card} from "../Model/Card";
+import axios from "axios";
 
 
-function castToCard(body: string): Card {
+function castToCards(body: any): Card[] {
+  return body.map((cardData: any) => {
+    return {
+      cardId: cardData.cardId,
+      name: cardData.name,
+      cost: cardData.cost,
+      attack: cardData.attack,
+      health: cardData.health,
+      text: cardData.text,
+      type: cardData.type,
+      picture: cardData.img
+    };
+  });
 
-  let myCard: { cardId: string; name: string };
-  myCard = {
-    cardId: body[0],
-    name: body[2]
-  }
-  return <Card>myCard;
+
 
 }
 
@@ -23,8 +31,7 @@ function castToCard(body: string): Card {
 export class CardServiceService {
   private baseUrl: string;
   private header: any;
-  private axios = require("axios");
-  constructor(private http: HttpClient) {
+  constructor() {
     this.baseUrl = "https://omgvamp-hearthstone-v1.p.rapidapi.com";
     this.header = {
       'X-RapidAPI-Key': '6847fb838amsha289d9dfc14b473p1f8af5jsnd001bb4c6026',
@@ -37,10 +44,10 @@ export class CardServiceService {
     const option = {
       method: 'GET',
       url: this.baseUrl + '/info',
-      header: this.header
+      headers: this.header
     }
     try {
-      const response = await this.axios.request(option)
+      const response = await axios.request(option)
       return response.data;
     } catch (error) {
       console.log(error);
@@ -52,12 +59,12 @@ export class CardServiceService {
     const option = {
       method: 'GET',
       url: this.baseUrl + '/cards/' + name,
-      header: this.header
+      headers: this.header
     }
 
     try {
-      const response = await this.axios.request(option)
-      return castToCard(response.data)
+      const response = await axios.request(option)
+      return castToCards(response.data)
     } catch (error) {
       console.log(error);
     }
@@ -67,12 +74,14 @@ export class CardServiceService {
     const option = {
       method: 'GET',
       url: this.baseUrl + '/cards/classes/' + hsClass,
-      header: this.header
+      headers: this.header
     }
 
     try {
-      const response = await this.axios.request(option)
-      return castToCard(response.data)
+      const response = await axios.request(option)
+      console.log(response.data);
+      return castToCards(response.data);
+
     } catch (error) {
       console.log(error);
     }
@@ -83,12 +92,12 @@ export class CardServiceService {
     const option = {
       method: 'GET',
       url: this.baseUrl + '/cards/races/' + race,
-      header: this.header
+      headers: this.header
     }
 
     try {
-      const response = await this.axios.request(option)
-      return castToCard(response.data)
+      const response = await axios.request(option)
+      return castToCards(response.data)
     } catch (error) {
       console.log(error);
     }
@@ -98,12 +107,12 @@ export class CardServiceService {
     const option = {
       method: 'GET',
       url: this.baseUrl + '/cards/sets/' + cardSet,
-      header: this.header
+      headers: this.header
     }
 
     try {
-      const response = await this.axios.request(option)
-      return castToCard(response.data)
+      const response = await axios.request(option)
+      return castToCards(response.data)
     } catch (error) {
       console.log(error);
     }
@@ -114,12 +123,12 @@ export class CardServiceService {
     const option = {
       method: 'GET',
       url: this.baseUrl + '/cards/types/' + cardType,
-      header: this.header
+      headers: this.header
     }
 
     try {
-      const response = await this.axios.request(option)
-      return castToCard(response.data)
+      const response = await axios.request(option)
+      return castToCards(response.data)
     } catch (error) {
       console.log(error);
     }
@@ -129,11 +138,11 @@ export class CardServiceService {
     const option = {
       method: 'GET',
       url: this.baseUrl + '/cards',
-      header: this.header
+      headers: this.header
     }
     try {
-      const response = await this.axios.request(option)
-      return castToCard(response.data)
+      const response = await axios.request(option)
+      return castToCards(response.data)
     } catch (error) {
       console.log(error);
     }
